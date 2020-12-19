@@ -1,9 +1,12 @@
 import React from 'react';
+import LogRocket from 'logrocket';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Slider } from '@material-ui/core';
 
 import ItemCard from './ItemCard';
-import cards from './store';
+import data from './store';
+
+LogRocket.init('9aapdz/the-best-bang');
 
 const useStyles = makeStyles((theme) => ({
   pageTitle: {
@@ -24,6 +27,8 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative'
   }
 }));
+let sortedData = data.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+sortedData = sortedData.slice(0, 200); // keep top 200 items
 
 export default function App() {
   const classes = useStyles();
@@ -33,36 +38,35 @@ export default function App() {
     setMaxPrice(newValue);
     // console.log('newValue', newValue);
   };
-
   return (
     <main>
       <section className={classes.pageTitle}>
-        <Typography variant="h4">The Best Bang</Typography>
+        <h1 style={{ fontSize: '1em' }}>The Best Bang 💥</h1>
       </section>
       <div style={{ width: '30%', margin: '0 auto' }}>
-        <span>$ Price Filter</span>
+        <small>$ Price Filter</small>
         <Slider
           defaultValue={3000}
           aria-labelledby="discrete-slider"
           valueLabelDisplay="auto"
           step={20}
           marks
-          min={20}
+          min={0}
           max={3000}
           onChange={handleChange}
         />
       </div>
 
       <section className={classes.cardsLayout}>
-        {cards.map((card, index) => {
-          if (!card.title) {
+        {sortedData.map((item, index) => {
+          if (!item.title) {
             return null;
           }
-          const price = parseFloat((card.price ?? '0').replace(/\$/g, '').replace(/,/g, ''));
+          const price = parseFloat((item.price ?? '0').replace(/\$/g, '').replace(/,/g, ''));
           if (price > maxPrice) {
             return null;
           }
-          return <ItemCard key={index} data={card} />;
+          return <ItemCard key={index} data={item} />;
         })}
       </section>
 
